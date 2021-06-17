@@ -60,7 +60,7 @@ configure the labels and selectors to target `app=nginx` and `env=prod`. The yam
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: example-rs
+  name: rs-example
 spec:
   replicas: 3
   selector:
@@ -84,11 +84,11 @@ spec:
 
 1) Open a new terminal ad watch as the newly created ReplicaSet provisions the Pods based off the Pod Template.
 ```
-$ kubectl get pods --watch --show-labels
+kubectl get pods --watch --show-labels
 ```
 2) Create the ReplicaSet
 ```
-$ kubectl create -f manifests/rs-example.yaml
+kubectl create -f manifests/rs-example.yaml
 ```
 
 Note that the newly provisioned Pods are given a name based off the ReplicaSet name appended with a 5 character random
@@ -96,7 +96,7 @@ string. These Pods are labeled with the labels as specified in the manifest.
 
 3) Scale ReplicaSet `rs-example` up to `5` replicas with the below command.
 ```
-$ kubectl scale replicaset rs-example --replicas=5
+kubectl scale replicaset rs-example --replicas=5
 ```
 **Tip:** `replicaset` can be substituted with `rs` when using `kubectl`.
 
@@ -138,18 +138,18 @@ spec:
 
 **Command**
 ```
-$ kubectl create -f manifests/pod-rs-example.yaml
+kubectl create -f manifests/pod-rs-example.yaml
 ```
 
 8) Immediately watch the Pods.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
 Note that the Pod is created and immediately terminated.
 
 9) Describe `rs-example` and look at the `events`.
 ```
-$ kubectl describe rs rs-example
+kubectl describe rs rs-example
 ```
 There will be an entry with `Deleted pod: pod-example`. This is because a ReplicaSet targets **ALL** Pods matching
 the labels supplied in the selector.
