@@ -88,7 +88,7 @@ kubectl get pods --watch --show-labels
 ```
 2) Create the ReplicaSet
 ```
-kubectl create -f manifests/rs-example.yaml
+kubectl apply -f manifests/rs-example.yaml
 ```
 
 Note that the newly provisioned Pods are given a name based off the ReplicaSet name appended with a 5 character random
@@ -138,7 +138,7 @@ spec:
 
 **Command**
 ```
-kubectl create -f manifests/pod-rs-example.yaml
+kubectl apply -f manifests/pod-rs-example.yaml
 ```
 
 8) Immediately watch the Pods.
@@ -222,24 +222,24 @@ spec:
 
 **Command**
 ```
-$ kubectl create -f manifests/deploy-example.yaml --record
+kubectl apply -f manifests/deploy-example.yaml
 ```
 
 2) Check the status of the Deployment.
 ```
-$ kubectl get deployments
+kubectl get deployments
 ```
 
 3) Once the Deployment is ready, view the current ReplicaSets and be sure to show the labels.
 ```
-$ kubectl get rs --show-labels
+kubectl get rs --show-labels
 ```
 Note the name and `pod-template-hash` label of the newly created ReplicaSet. The created ReplicaSet's name will
 include the `pod-template-hash`.
 
 4) Describe the generated ReplicaSet.
 ```
-$ kubectl describe rs deploy-example-<pod-template-hash>
+kubectl describe rs deploy-example-<pod-template-hash>
 ```
 Look at both the `Labels` and the `Selectors` fields. The `pod-template-hash` value has automatically been added to
 both the Labels and Selector of the ReplicaSet. Then take note of the `Controlled By` field. This will reference the
@@ -247,13 +247,13 @@ direct parent object, and in this case the original `deploy-example` Deployment.
 
 5) Now, get the Pods and pass the `--show-labels` flag.
 ```
-$ kubectl get pods --show-labels
+kubectl get pods --show-labels
 ```
 Just as with the ReplicaSet, the Pods name are labels include the `pod-template-hash`.
 
 6) Describe one of the Pods.
 ```
-$ kubectl describe pod deploy-example-<pod-template-hash-<random>
+kubectl describe pod deploy-example-<pod-template-hash-<random>
 ```
 Look at the `Controlled By` field. It will contain a reference to the parent ReplicaSet, but not the parent Deployment.
 
@@ -262,14 +262,11 @@ Now that the relationship from Deployment to ReplicaSet to Pod is understood. It
 
 7) Open a terminal and watch the Pods.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
-8) Update the `deploy-example` manifest and add a few additional labels to the Pod template. Once done, apply the
-change with the `--record` flag.
+8) Update the `deploy-example` manifest and add a few additional labels to the Pod template. Once done, apply the change:
 ```
-$ kubectl apply -f manifests/deploy-example.yaml --record
-  < or >
-$ kubectl edit deploy deploy-example --record
+kubectl apply -f manifests/deploy-example.yaml
 ```
 **Tip:** `deploy` can be substituted for `deployment` when using `kubectl`.
 
@@ -279,18 +276,18 @@ the [Deployment Strategy Documentation](https://kubernetes.io/docs/concepts/work
 
 9) Now view the ReplicaSets.
 ```
-$ kubectl get rs --show-labels
+kubectl get rs --show-labels
 ```
 There will now be two ReplicaSets, with the previous version of the Deployment being scaled down to 0.
 
 10) Now, scale the Deployment up as you would a ReplicaSet, and set the `replicas=5`.
 ```
-$ kubectl scale deploy deploy-example --replicas=5
+kubectl scale deploy deploy-example --replicas=5
 ```
 
 11) List the ReplicaSets.
 ```
-$ kubectl get rs --show-labels
+kubectl get rs --show-labels
 ```
 Note that there is **NO** new ReplicaSet generated. Scaling actions do **NOT** trigger a change in the Pod Template.
 
@@ -322,25 +319,25 @@ have not, complete it first before continuing.
 
 1) Use the `rollout` command to view the `history` of the Deployment `deploy-example`.
 ```
-$ kubectl rollout history deployment deploy-example
+kubectl rollout history deployment deploy-example
 ```
 There should be two revisions. One for when the Deployment was first created, and another when the additional Labels
 were added. The number of revisions saved is based off of the `revisionHistoryLimit` attribute in the Deployment spec.
 
 2) Look at the details of a specific revision by passing the `--revision=<revision number>` flag.
 ```
-$ kubectl rollout history deployment deploy-example --revision=1
-$ kubectl rollout history deployment deploy-example --revision=2
+kubectl rollout history deployment deploy-example --revision=1
+kubectl rollout history deployment deploy-example --revision=2
 ```
 Viewing the specific revision will display a summary of the Pod Template.
 
 3) Open a terminal and watch the Pods.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
 4) Choose to go back to revision `1` by using the `rollout undo` command.
 ```
-$ kubectl rollout undo deployment deploy-example --to-revision=1
+kubectl rollout undo deployment deploy-example --to-revision=1
 ```
 They will cycle through rolling back to the previous revision.
 
@@ -348,7 +345,7 @@ They will cycle through rolling back to the previous revision.
 
 5) Describe the Deployment `deploy-example`.
 ```
-$ kubectl describe deployment deploy-example
+kubectl describe deployment deploy-example
 ```
 The events will describe the scaling back of the previous and switching over to the desired revision.
 
@@ -391,7 +388,7 @@ how they are scheduled and how an update occurs.
 $ cd k8s-intro-tutorials/workloads/
 ```
 
-1) Create DaemonSet `ds-example` and pass the `--record` flag. Use the example yaml block below as a base, or use
+1) Create DaemonSet `ds-example`. Use the example yaml block below as a base, or use
 the manifest `manifests/ds-example.yaml` directly.
 
 **manifests/ds-example.yaml**
@@ -421,49 +418,47 @@ spec:
 
 **Command**
 ```
-$ kubectl create -f manifests/ds-example.yaml --record
+kubectl apply -f manifests/ds-example.yaml
 ```
 
 2) View the current DaemonSets.
 ```
-$ kubectl get daemonset
+kubectl get daemonset
 ```
 As there are no matching nodes, no Pods should be scheduled.
 
 3) Label the `minikube` node with `nodeType=edge`
 ```
-$ kubectl label node minikube nodeType=edge --overwrite
+kubectl label node minikube nodeType=edge --overwrite
 ```
 
 4) View the current DaemonSets once again.
 ```
-$ kubectl get daemonsets
+kubectl get daemonsets
 ```
 There should now be a single instance of the DaemonSet `ds-example` deployed.
 
 5) View the current Pods and display their labels with `--show-labels`.
 ```
-$ kubectl get pods --show-labels
+kubectl get pods --show-labels
 ```
 Note that the deployed Pod has a `controller-revision-hash` label. This is used like the `pod-template-hash` in a
 Deployment to track and allow for rollback functionality.
 
 6) Describing the DaemonSet will provide you with status information regarding it's Deployment cluster wide.
 ```
-$ kubectl describe ds ds-example
+kubectl describe ds ds-example
 ```
 **Tip:** `ds` can be substituted for `daemonset` when using `kubectl`.
 
 7) Open a terminal and watch the Pods and be sure to show the labels.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
 
-8) Update the DaemonSet by adding a few additional labels to the Pod Template and use the `--record` flag.
+8) Update the DaemonSet by adding a few additional labels to the Pod Template:
 ```
-$ kubectl apply -f manifests/ds-example.yaml --record
-  < or >
-$ kubectl edit ds ds-example --record
+kubectl apply -f manifests/ds-example.yaml
 ```
  
 The old version of the DaemonSet will be phased out one at a time and instances of the new version will take its
@@ -492,33 +487,33 @@ the previous exercise [Managing DaemonSets](#exercise-managing-daemonsets) and i
 
 1) Use the `rollout` command to view the `history` of the DaemonSet `ds-example`
 ```
-$ kubectl rollout history ds ds-example
+kubectl rollout history ds ds-example
 ```
 There should be two revisions. One for when the Deployment was first created, and another when the additional Labels
 were added. The number of revisions saved is based off of the `revisionHistoryLimit` attribute in the DaemonSet spec.
 
 2) Look at the details of a specific revision by passing the `--revision=<revision number>` flag.
 ```
-$ kubectl rollout history ds ds-example --revision=1
-$ kubectl rollout history ds ds-example --revision=2
+kubectl rollout history ds ds-example --revision=1
+kubectl rollout history ds ds-example --revision=2
 ```
 Viewing the specific revision will display the Pod Template.
 
 3) Choose to go back to revision `1` by using the `rollout undo` command.
 ```
-$ kubectl rollout undo ds ds-example --to-revision=1
+kubectl rollout undo ds ds-example --to-revision=1
 ```
 **Tip:** The `--to-revision` flag can be omitted if you wish to just go back to the previous configuration.
 
 4) Immediately watch the Pods.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
 They will cycle through rolling back to the previous revision.
 
 5) Describe the DaemonSet `ds-example`.
 ```
-$ kubectl describe ds ds-example
+kubectl describe ds ds-example
 ```
 The events will be sparse with a single host, however in an actual Deployment they will describe the status of
 updating the DaemonSet cluster wide, cycling through hosts one-by-one.
@@ -816,11 +811,11 @@ spec:
 **Command**
 1) open a terminal and watch the Pods as they are being created.
 ```
-$ kubectl get pods --show-labels --watch
+kubectl get pods --show-labels --watch
 ```
 2) Create the job
 ```
-$ kubectl create -f manifests/job-example.yaml
+kubectl apply -f manifests/job-example.yaml
 ```
 Only two Pods are being provisioned at a time; adhering to the `parallelism` attribute. This is done until the total
 number of `completions` is satisfied. Additionally, the Pods are labeled with `controller-uid`, this acts as a
@@ -831,17 +826,17 @@ This is intentional to better support troubleshooting.
 
 3) A summary of these events can be seen by describing the Job itself.
 ```
-$ kubectl describe job job-example
+kubectl describe job job-example
 ```
 
 4) Delete the job.
 ```
-$ kubectl delete job job-example
+kubectl delete job job-example
 ```
 
 5) View the Pods once more.
 ```
-$ kubectl get pods
+kubectl get pods
 ```
 The Pods will now be deleted. They are cleaned up when the Job itself is removed.
 
@@ -893,12 +888,12 @@ spec:
 
 **Command**
 ```
-$ kubectl create -f manifests/cronjob-example.yaml
+kubectl apply -f manifests/cronjob-example.yaml
 ```
 
 2) Monitor the Jobs 
 ```
-$ kubectl get jobs --watch
+kubectl get jobs --watch
 ```
 
 There should be at least one Job named in the format `<cronjob-name>-<unix time stamp>`. Note the timestamp of
@@ -906,7 +901,7 @@ the oldest Job.
 
 3) After some minutes (more than 3) stop the job monitoring and list the jobs once again
 ```
-$ kubectl get jobs 
+kubectl get jobs 
 ```
 The oldest Job should have been removed. The CronJob controller will purge Jobs according to the
 `successfulJobHistoryLimit` and `failedJobHistoryLimit` attributes. In this case, it is retaining strictly the
@@ -914,18 +909,18 @@ last 3 successful Jobs.
 
 4) Describe the CronJob `cronjob-example` 
 ```
-$ kubectl describe CronJob cronjob-example
+kubectl describe CronJob cronjob-example
 ```
 
 5) list the pods and see that their logs contain the Hello message
 ```
-$ kubectl get pods
-$ kubectl logs <your pod name>
+kubectl get pods
+kubectl logs <your pod name>
 ```
 
 6) Edit the CronJob `cronjob-example` and locate the `Suspend` field. Then set it to true.
 ```
-$ kubectl edit cronjob cronjob-example
+kubectl edit cronjob cronjob-example
 ```
 This will prevent the cronjob from firing off any future events, and is useful to do to initially troubleshoot
 an issue without having to delete the CronJob directly.
@@ -933,7 +928,7 @@ an issue without having to delete the CronJob directly.
 
 7) Delete the CronJob
 ```
-$ kubectl delete cronjob cronjob-example
+kubectl delete cronjob cronjob-example
 ```
 Deleting the CronJob **WILL** delete all child Jobs. Use `Suspend` to _'stop'_ the Job temporarily if attempting
 to troubleshoot.
