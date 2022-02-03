@@ -5,7 +5,7 @@ is essential to using Kubernetes itself.
 ## Before you begin
 Clone the repository 
 ```
-git clone https://github.com/andreaceccanti/k8s-intro-tutorials
+git clone https://github.com/caifti/k8s-intro-tutorials
 ```
 Go to the exercises directory 
 ```
