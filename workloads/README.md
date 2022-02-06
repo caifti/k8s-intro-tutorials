@@ -9,7 +9,7 @@ In **ALL CASES** a Pod Template is included, and acts as the base tier of manage
 `minidev` context. Switch to the `minikube` context before proceeding with the rest of the tutorials.
 
 2) Unlike some of the other tutorials, the workload exercises should be cleaned up before moving onto the next
- workload type. The clean-up commands will included after **Summary** section of the exercise.
+ workload type. The clean-up commands will be included after **Summary** section of the exercise.
  
 ## Before you begin
 Go to your working directory 
