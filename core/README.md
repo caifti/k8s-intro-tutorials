@@ -359,7 +359,7 @@ kubectl  port-forward --address=0.0.0.0 svc/clusterip 8080:80
 ```
 **URL**
 ```
-http://<your-olss-vm-machine-ip>:8080
+http://<your-vm-machine-ip>:8080
 ```
 
 4) Lastly, verify that the generated DNS record has been created for the Service by using nslookup within the
